@@ -1,0 +1,73 @@
+<!--
+//  --------------------------------------------------------------
+//  Copyright(C) 2016 Kaiwen Cheng. All Rights Reserved.
+//  --------------------------------------------------------------
+//  Disclaimers
+//  NO WARRANTY FOR SOURCE CODE
+//  ALL SOURCE CODE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>Untitled Page</title>
+<script type="text/javascript">
+    var bUpdating1 = false;
+    var winWidth, winHeight;
+    var webcamimage1, webcamimage2, webcamimage3, webcamimage4;
+    var sOBj = '';
+    var vidWidth, vidHeight;
+    var imgBase1 = '', imgBase2 = '', imgBase3 = '', imgBase4 = '';
+    var c = Math.floor((Math.random() * 100000) + 1);
+    var timerIDRefresh, timerID2Refresh;
+
+    function update() {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", "/live.jpg?cnt=" + c++, true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onerror = function (e) {
+            setTimeout("update()", 5000);
+        }
+        xhr.onload = function (e) {
+            if (bUpdating1) return;
+            bUpdating1 = true;
+            var arrayBufferView = new Uint8Array(this.response);
+            if (arrayBufferView.length > 0) {
+                var blob = new Blob([arrayBufferView], { type: "image/jpeg" });
+                var urlCreator = window.URL || window.webkitURL;
+                var imageUrl = urlCreator.createObjectURL(blob);
+                var img = document.querySelector("#photo");
+                img.addEventListener("load", function (evt) {
+                    URL.revokeObjectURL(evt.target.src);
+                });
+                if (null != imageUrl && null != img) img.src = imageUrl;
+            }
+            bUpdating1 = false;
+            setTimeout("update()", 200);
+        };
+        xhr.send();
+    }
+
+    function init() {
+        winWidth = window.innerWidth || window.document.documentElement.clientWidth || window.document.body.clientWidth;
+        winHeight = window.innerHeight || window.document.documentElement.clientHeight || window.document.body.clientHeight;
+        sObj = '';
+        webcamimage1 = document.getElementById("webcamimage1");
+        timerIDRefresh = setTimeout("update()", 200);
+    }
+    
+    window.onunload = function () { if (timerIDRefresh) clearInterval(timerIDRefresh); }
+    window.onload = init;
+
+</script>
+</head>
+<body>
+  
+Live<br/>
+
+<img id="photo"/>
+ 
+
+</body>
+</html>
