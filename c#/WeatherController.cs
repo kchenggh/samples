@@ -19,7 +19,7 @@ namespace webapiTest.Controllers
 		[HttpGet("[action]")]
 		public async Task<Weather> GetWeather(string zip)
 		{
-			if(string.IsNullOrWhiteSpace(zip)) return null;
+			if(string.IsNullOrWhiteSpace(zip) || zip.Length < 5) return null;
 			zip = zip.Substring(0, 5);
 			string key = "your_api_key";
 			string queryString = "http://api.openweathermap.org/data/2.5/weather?zip=" + zip
@@ -39,15 +39,15 @@ namespace webapiTest.Controllers
 					if(data["weather"] != null) {
 						Weather weather = new Weather();
 						weather.Title = (string)data["name"];
-						weather.Wind = (string)data["wind"]["speed"] + " mph";
-						weather.Humidity = (string)data["main"]["humidity"] + " %";
+						weather.Wind = (string)data["wind"]["speed"];
+						weather.Humidity = (string)data["main"]["humidity"];
 						weather.Visibility = (string)data["weather"][0]["main"];
 
 						DateTime time = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
 						DateTime sunrise = time.AddSeconds((double)data["sys"]["sunrise"]);
 						DateTime sunset = time.AddSeconds((double)data["sys"]["sunset"]);
-						weather.Sunrise = sunrise.ToString() + " UTC";
-						weather.Sunset = sunset.ToString() + " UTC";
+						weather.Sunrise = sunrise.ToString();
+						weather.Sunset = sunset.ToString();
 						return weather;
 					}
 				}
@@ -56,8 +56,7 @@ namespace webapiTest.Controllers
 			return null;
 		}
 
-		public class Weather
-		{
+		public class Weather {
 			public string Title { get; set; }
 			public string Temperature { get; set; }
 			public string Wind { get; set; }
@@ -65,17 +64,6 @@ namespace webapiTest.Controllers
 			public string Visibility { get; set; }
 			public string Sunrise { get; set; }
 			public string Sunset { get; set; }
-
-			public Weather()
-			{
-				this.Title = "title";
-				this.Temperature = "123.1";
-				this.Wind = " ";
-				this.Humidity = " ";
-				this.Visibility = " ";
-				this.Sunrise = " ";
-				this.Sunset = " ";
-			}
-		}		
+		}
 	}
 }
